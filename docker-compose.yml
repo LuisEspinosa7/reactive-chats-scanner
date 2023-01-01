@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+
+  rca-chat-generator:
+    image: msv-chat-generator:1.0
+    container_name: "rca-chat-generator"
+    hostname: rca-chat-generator-host
+    environment:
+      - SOURCE_FILE=/mnt/generator/topical_chat_short.csv
+      - INPUT_REACTIVE_INTERVAL=200
+      - MONGODB_URL=host.docker.internal
+    ports:
+      - "8090:8090"
+    networks:
+      - rca-network
+    volumes:
+      - D:/Development/PROJECTS/10.REACTIVE-CHAT-ANALYZER/generator-files:/mnt/generator
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 120M
+        reservations:
+          cpus: 0.5
+          memory: 20M
+
+  rca-analyzer:
+    image: msv-analyzer:1.0
+    container_name: "rca-analyzer"
+    hostname: rca-analyzer-host
+    environment:
+      - FORBIDDEN_WORDS_FILE=/mnt/analyzer/forbbiden.csv
+    ports:
+      - "8082:8082"
+    networks:
+      - rca-network
+    volumes:
+      - D:/Development/PROJECTS/10.REACTIVE-CHAT-ANALYZER/analyzer:/mnt/analyzer
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 120M
+        reservations:
+          cpus: 0.5
+          memory: 20M
+
+  rca-reporter:
+    image: msv-reporter:1.0
+    container_name: "rca-reporter"
+    hostname: rca-reporter-host
+    environment:
+      - MONGODB_URL=host.docker.internal
+      - RCA-DB-RETRIES=3
+      - RCA-DB-INTERVAL=1000
+    ports:
+      - "8084:8084"
+    networks:
+      - rca-network
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 120M
+        reservations:
+          cpus: 0.5
+          memory: 20M
+
+
+  rca-reader:
+    image: msv-reader:1.0
+    container_name: "rca-reader"
+    hostname: rca-reader-host
+    environment:
+      - MONGODB_URL=host.docker.internal
+      - DB_REACTIVE_INTERVAL=1000
+      - DB_REACTIVE_LIMIT=10
+      - RCA-DB-RETRIES=2
+      - RCA-DB-INTERVAL=1000
+      - ANALYZERS_URL=host.docker.internal
+    ports:
+      - "8081:8081"
+    networks:
+      - rca-network
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 120M
+        reservations:
+          cpus: 0.5
+          memory: 20M
+
+
+networks:
+  rca-network:
+    driver: bridge
