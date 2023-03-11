@@ -1,0 +1,30 @@
+### BASIC WORD DETECTOR ###
+
+
+# GENERATOR
+docker build -t msv-chat-generator:1.0 . -f .\msv-chat-generator\Dockerfile
+docker tag msv-chat-generator:1.0 luisllanos8/msv-chat-generator:1.0
+docker push luisllanos8/msv-chat-generator:1.0
+
+
+# READER
+docker build -t msv-reader:1.0 . -f .\msv-reader\Dockerfile
+docker tag msv-reader:1.0 luisllanos8/msv-reader:1.0
+docker push luisllanos8/msv-reader:1.0
+docker-compose -f .\docker-compose-reader.yml up -d
+
+# ANALYZER
+docker build -t msv-analyzer:1.0 . -f .\msv-analyzer\Dockerfile
+docker tag msv-analyzer:1.0 luisllanos8/msv-analyzer:1.0
+docker push luisllanos8/msv-analyzer:1.0
+docker-compose -f .\docker-compose-analyzer.yml up -d
+
+# REPORTER
+docker build -t msv-reporter:1.0 . -f .\msv-reporter\Dockerfile
+docker tag msv-reporter:1.0 luisllanos8/msv-reporter:1.0
+docker push luisllanos8/msv-reporter:1.0
+docker-compose -f .\docker-compose-reporter.yml up -d
+
+
+# AFTER BUILDING DOCKER IMAGES
+docker-compose -f .\docker-compose.yml up -d
